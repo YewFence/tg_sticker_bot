@@ -10,7 +10,7 @@ import logging
 import pprint
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..config import DOWNLOAD_DIR
+from ..config import DOWNLOAD_DIR, TEST_MODE, DOWNLOAD_LIMIT
 from ..utils.bot import send_message
 
 logger = logging.getLogger(__name__)
@@ -45,6 +45,9 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
     # 2. 遍历包里的所有表情（下载整个集合）
     download_count = 0
     for i, sticker_in_set in enumerate(sticker_set.stickers):
+        if TEST_MODE and i >= DOWNLOAD_LIMIT:
+            logger.info(f"测试模式下，已达到下载上限 {DOWNLOAD_LIMIT}，停止下载。")
+            break
         file_id = sticker_in_set.file_id
         # 3. 获取文件对象
         file = await context.bot.get_file(file_id)
