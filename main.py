@@ -1,9 +1,13 @@
 import logging
+import os  # 导入 os 模块
+from dotenv import load_dotenv  # 导入 load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 
+# 加载 .env 文件中的环境变量
+load_dotenv()
 # 把这里 'YOUR_API_TOKEN' 替换成你自己的 Token
-API_TOKEN = 'YOUR_API_TOKEN' 
+API_TOKEN = os.getenv("API_TOKEN")
 
 # (可选) 开启日志，这在调试时非常有用
 logging.basicConfig(
