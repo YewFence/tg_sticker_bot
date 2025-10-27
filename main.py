@@ -199,16 +199,23 @@ async def get_sticker_set(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 5. 关键检查：被回复的那条消息是不是一个表情包？
     sticker_received = replied_message.sticker
-
     if not sticker_received:
-        # 如果回复了，但回复的不是表情包 (比如是文本)
+        # 如果回复了，但回复的不是表情包
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="⚠️ 你回复的不是一个表情包哦！\n请用 /get 回复一个表情包。"
         )
         return
+
     # 获取表情包集信息
-    sticker_set = await context.bot.get_sticker_set(sticker_received.set_name)
+    set_name = sticker_received.set_name
+    if not set_name:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="这个贴纸不属于公开表情包集，暂时无法批量下载。"
+        )
+        return
+    sticker_set = await context.bot.get_sticker_set(set_name)
     # 6. 关键步骤：下载贴纸
     await _download_sticker_set_files(sticker_set, update, context)
 
