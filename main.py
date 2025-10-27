@@ -18,6 +18,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# 辅助：获取并缓存机器人的用户名，避免每次都请求 get_me
+async def _get_bot_username(context: ContextTypes.DEFAULT_TYPE) -> str:
+    bot_data = context.application.bot_data
+    username = bot_data.get("bot_username")
+    if username:
+        return username
+    me = await context.bot.get_me()
+    username = me.username or ""
+    bot_data["bot_username"] = username
+    logger.info(f"Bot username 缓存为: @{username}")
+    return username
+
 # 1. 定义 /start 命令的处理函数
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """当用户发送 /start 时，机器人回复这条消息"""
@@ -107,6 +119,35 @@ async def _download_sticker_set_files(sticker_set, update: Update, context: Cont
         text=f"✅ 下载完成！\n包名: {title}\n总共 {download_count} 张表情已保存到服务器的 {download_dir} 文件夹。"
     )
 
+async def mention_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """当在群聊中有人 @机器人 时，给出提示信息。
+    仅在文本消息中处理，忽略命令消息，避免与其他指令冲突。
+    """
+    message = update.effective_message
+    if not message:
+        return
+    # 忽略命令，避免在 /get@botname 这类命令时重复响应
+    if message.text and message.text.startswith("/"):
+        return
+
+    text = (message.text or message.caption or "").casefold()
+    if not text:
+        return
+    
+    username = await _get_bot_username(context)
+    if not username:
+        return
+
+    at_me = f"@{username}".casefold()
+    if at_me not in text:
+        return
+    # 提示信息，可按需调整
+    hint = (
+        "👋 我在呢！\n"
+        "用 /get 去‘回复’某个贴纸，我会批量下载它的表情包集。"
+    )
+    await message.reply_text(hint)
+
 async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """响应用户发送的贴纸消息"""
     try:
@@ -180,11 +221,10 @@ if __name__ == '__main__':
     # 告诉机器人，当收到 /start 命令时，调用 start 函数启动
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
-    
-    # 告诉机器人，当收到“文本”消息时，调用 echo_text 函数
-    # filters.TEXT & (~filters.COMMAND) 表示：只处理文本消息，并且排除掉命令
-    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo_text)
-    application.add_handler(echo_handler)
+
+    # 当文本中出现 @机器人 时，给出使用提示
+    mention_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), mention_reply)
+    application.add_handler(mention_handler)
 
     # 告诉机器人，当收到“贴纸”消息时，调用 sticker_echo 函数
     # 和text不一样的filter用法
