@@ -128,3 +128,6 @@ tg_sticker_bot/
 
 
 —— 祝使用愉快 🙂
+
+## License
+MIT License © YewFence
