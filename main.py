@@ -109,8 +109,8 @@ async def _download_sticker_set_files(sticker_set, update: Update, context: Cont
 
 async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """响应用户发送的贴纸消息"""
-    sticker_received = update.message.sticker
     try:
+        sticker_received = update.message.sticker
         sticker_set_name = sticker_received.set_name or ""
         if sticker_set_name:
             sticker_set = await context.bot.get_sticker_set(sticker_set_name)
@@ -141,6 +141,37 @@ async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="坏了，我好像没法处理这个表情包诶。"
         )
 
+async def get_sticker_set(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """响应get命令里回复消息中的贴纸"""
+    logger.info("收到了 /get 命令，开始检查...")
+        
+    # 4. 关键检查：这条 /get 命令是否在 '回复' 另一条消息？
+    replied_message = update.message.reply_to_message
+    
+    if not replied_message:
+        # 如果没有回复任何消息
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="⚠️ 使用方法错误！\n请用 /get 这条命令去回复一个你想下载的表情包。"
+        )
+        return
+
+    # 5. 关键检查：被回复的那条消息是不是一个表情包？
+    sticker_received = replied_message.sticker
+
+    if not sticker_received:
+        # 如果回复了，但回复的不是表情包 (比如是文本)
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="⚠️ 你回复的不是一个表情包哦！\n请用 /get 回复一个表情包。"
+        )
+        return
+    # 获取表情包集信息
+    sticker_set = await context.bot.get_sticker_set(sticker_received.set_name)
+    # 6. 关键步骤：下载贴纸
+    await _download_sticker_set_files(sticker_set, update, context)
+
+
 if __name__ == '__main__':
     # 创建 Application
     application = ApplicationBuilder().token(API_TOKEN).build()
@@ -159,6 +190,10 @@ if __name__ == '__main__':
     # 和text不一样的filter用法
     sticker_handler = MessageHandler(filters.Sticker.ALL, sticker_echo)
     application.add_handler(sticker_handler)
+
+    # 告诉机器人，当收到 /get 命令时，调用 get_sticker_set 函数
+    get_sticker_set_handler = CommandHandler('get', get_sticker_set)
+    application.add_handler(get_sticker_set_handler)
 
     # 启动机器人
     # run_polling() 会开始不断地从 Telegram "拉取" 新消息
