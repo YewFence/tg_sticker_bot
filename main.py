@@ -42,19 +42,30 @@ async def echo_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """响应用户发送的贴纸消息"""
     sticker_received = update.message.sticker
-    message = f"我收到了你的表情包！它的id是: {sticker_received.file_id}，属于表情包集: {sticker_received.set_name}"
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message
-    )
-    await context.bot.send_sticker(
-        chat_id=update.effective_chat.id,
-        sticker=sticker_received.file_id
-    )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="这是我给你回传的表情包！它真有意思，对吧？"
-    )
+    try:
+        sticker_set_name = sticker_received.set_name or ""
+        if sticker_set_name:
+            message = f"我收到了你的表情包！它的id是: {sticker_received.file_id}\n属于表情包集: {sticker_set_name}"
+        else:
+            message = f"我收到了你的表情包！它的id是: {sticker_received.file_id}\n但是它不属于任何表情包集捏。"
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=message
+        )
+        await context.bot.send_sticker(
+            chat_id=update.effective_chat.id,
+            sticker=sticker_received.file_id
+        )
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="这是我给你回传的表情包！它真有意思，对吧？"
+        )
+    except Exception as e:
+        logger.error(f"处理贴纸时出错: {e}")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="坏了，我好像没法处理这个表情包诶。"
+        )
 
 if __name__ == '__main__':
     # 创建 Application
