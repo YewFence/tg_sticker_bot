@@ -22,3 +22,7 @@ dist/
 
 # SQLite
 data.db
+
+# CLI
+CLAUDE.md
+settings.local.json
