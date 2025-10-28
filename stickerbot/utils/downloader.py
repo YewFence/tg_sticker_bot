@@ -27,7 +27,7 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
         os.makedirs(download_dir)
         logger.info(f"创建了新目录: {download_dir}")
     # 提示信息
-    send_message(context, text=f"开始下载 {title} (共 {total_stickers} 张)... 这可能需要一点时间。")
+    await send_message(update, context, text=f"开始下载 {title} (共 {total_stickers} 张)... 这可能需要一点时间。")
     # 2. 遍历包里的所有表情（下载整个集合）
     download_count = 0
     for i, sticker_in_set in enumerate(sticker_set.stickers):
@@ -52,4 +52,4 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
             logger.info(f"已下载 {download_count} / {total_stickers} 张...")
 
     # 6. 全部下载完成后，给用户一个最终回复
-    send_message(context, text=f"✅ 下载完成！\n包名: {title}\n总共 {download_count} 张表情已保存到服务器。")
+    await send_message(update, context, text=f"✅ 下载完成！\n包名: {title}\n总共 {download_count} 张表情已保存到服务器。")

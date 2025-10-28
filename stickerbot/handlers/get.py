@@ -22,20 +22,20 @@ async def get_sticker_set(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not replied_message:
         # 如果没有回复任何消息
-        send_message(context, text="⚠️ 使用方法错误！\n请用 /get 这条命令去回复一个你想下载的表情包。")
+        await send_message(update, context, text="⚠️ 使用方法错误！\n请用 /get 这条命令去回复一个你想下载的表情包。")
         return
 
     # 5. 关键检查：被回复的那条消息是不是一个表情包？
     sticker_received = replied_message.sticker
     if not sticker_received:
         # 如果回复了，但回复的不是表情包
-        send_message(context, text="⚠️ 你回复的不是一个表情包哦！\n请用 /get 回复一个表情包。")
+        await send_message(update, context, text="⚠️ 你回复的不是一个表情包哦！\n请用 /get 回复一个表情包。")
         return
 
     # 获取表情包集信息
     set_name = sticker_received.set_name
     if not set_name:
-        send_message(context,text="这个贴纸不属于公开表情包集，暂时无法批量下载。")
+        await send_message(update, context,text="这个贴纸不属于公开表情包集，暂时无法批量下载。")
         return
     sticker_set = await context.bot.get_sticker_set(set_name)
     # 6. 关键步骤：下载贴纸

@@ -44,14 +44,14 @@ async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 3. 编辑回复信息
         message = f"我收到了你的表情包！它的id是: {sticker_received.file_id}\n{sticker_message}"
         # 4. 发送回复
-        send_message(context, text=message)
+        await send_message(update, context, text=message)
         # 5. 把贴纸发回去
         await context.bot.send_sticker(
             chat_id=update.effective_chat.id,
             sticker=sticker_received.file_id
         )
-        send_message(context, text="这是我给你回传的表情包！它真有意思，对吧？")
+        await send_message(update, context, text="这是我给你回传的表情包！它真有意思，对吧？")
     except Exception as e:
         logger.error(f"处理贴纸时出错: {e}")
-        send_message(context, text="坏了，我好像没法处理这个表情包诶。")
+        await send_message(update, context, text="坏了，我好像没法处理这个表情包诶。")
 
