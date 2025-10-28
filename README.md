@@ -49,7 +49,30 @@ python .\main.py
 启动后终端会显示“Bot启动中...”，此时即可在 Telegram 中与机器人交互。
 
 ## 或者：使用Docker
-等我研究一下，这就学
+
+### 构建 Docker 镜像
+
+在项目根目录运行以下命令来构建 Docker 镜像：
+
+```bash
+docker build -t tg_sticker_bot .
+```
+
+### 运行 Docker 容器
+
+运行以下命令来启动 Docker 容器：
+
+```bash
+docker run -d --name tg_sticker_bot_container -v $(pwd)/sticker_downloads:/app/sticker_downloads tg_sticker_bot
+```
+
+对于 PowerShell 用户，可以使用以下命令：
+
+```pwsh
+docker run -d --name tg_sticker_bot_container -v ${PWD}/sticker_downloads:/app/sticker_downloads tg_sticker_bot
+```
+
+这将会在后台运行机器人，并将 `sticker_downloads` 目录挂载到容器中，以便你可以访问下载的贴纸。
 
 
 ## 使用方式
@@ -123,7 +146,6 @@ tg_sticker_bot/
 - 若要拓展功能（如进度消息编辑、命名规范、重试机制），建议在 `handlers/stickers.py` 中实现，或者自己新开一个模块
 
 ## TODO
-- Docker
 - 保存方式：考虑自动上传云盘/放进QQ群文件
 
 
