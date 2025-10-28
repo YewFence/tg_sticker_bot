@@ -1,13 +1,13 @@
 """
 /get 命令处理器：
-- 要求在群聊中用 /get 去“回复”一条包含贴纸的消息
+- 要求在群聊中用 /get 去"回复"一条包含贴纸的消息
 - 下载该贴纸所属的整个表情包集
 """
 
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes
-from .stickers import download_sticker_set_files
+from ..utils.downloader import download_sticker_set_files
 from ..utils.bot import send_message
 
 logger = logging.getLogger(__name__)
