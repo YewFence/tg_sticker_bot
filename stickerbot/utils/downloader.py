@@ -30,6 +30,7 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
     await send_message(update, context, text=f"开始下载 {title} (共 {total_stickers} 张)... 这可能需要一点时间。")
     # 2. 遍历包里的所有表情（下载整个集合）
     download_count = 0
+    exist_count = 0
     for i, sticker_in_set in enumerate(sticker_set.stickers):
         if TEST_MODE and i >= DOWNLOAD_LIMIT:
             logger.info(f"测试模式下，已达到下载上限 {DOWNLOAD_LIMIT}，停止下载。")
