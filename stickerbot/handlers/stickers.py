@@ -33,8 +33,8 @@ async def sticker_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if sticker_set_name:
             # 2. 如果它属于一个表情包集，获取表情包集信息
             sticker_set = await context.bot.get_sticker_set(sticker_set_name)
-            # 3. 打印表情包集信息
-            _print_sticker_set_info(sticker_set)
+            # 3. 打印表情包集信息，算了感觉没必要）
+            # _print_sticker_set_info(sticker_set)
             sticker_count = len(sticker_set.stickers)
             sticker_message = f"属于表情包集: {sticker_set_name}，它包含 {sticker_count} 个表情包。"
         else:

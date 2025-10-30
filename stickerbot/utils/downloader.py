@@ -39,12 +39,18 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
         # 3. 获取文件对象
         file = await context.bot.get_file(file_id)
         # 打印看看 file 对象长什么样
-        logger.info(f"文件对象长这样: {pprint.pformat(file.to_dict())}")
+        logger.info(f"文件对象: {pprint.pformat(file.to_dict())}")
         # 自定义文件名：表情包集合名_sticker_序号.扩展名
         original_file_name = os.path.basename(file.file_path)
         file_extension = os.path.splitext(original_file_name)[1]  # 获取扩展名（如 .webp）
         file_name = f"{set_name}_sticker_{i+1}{file_extension}"
         local_path = os.path.join(download_dir, file_name)
+
+        # 检查文件是否已存在
+        if os.path.exists(local_path):
+            logger.info(f"文件已存在，跳过下载: {file_name}")
+            exist_count += 1
+            continue
 
         # 下载并保存
         await file.download_to_drive(custom_path=local_path)
@@ -55,4 +61,8 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
             logger.info(f"已下载 {download_count} / {total_stickers} 张...")
 
     # 6. 全部下载完成后，给用户一个最终回复
-    await send_message(update, context, text=f"✅ 下载完成！\n包名: {title}\n总共 {download_count} 张表情已保存到服务器。")
+    await send_message(update, context, text=(f"✅ 下载完成！"
+                                              f"包名: {title}\n"
+                                              f"总共 {download_count + exist_count} 张表情已保存到服务器。\n"
+                                              f"其中 {exist_count} 张表情已存在，跳过下载。"
+                                              f"新下载 {download_count} 张表情。"))
