@@ -39,8 +39,10 @@ async def download_sticker_set_files(sticker_set, update: Update, context: Conte
         file = await context.bot.get_file(file_id)
         # 打印看看 file 对象长什么样
         logger.info(f"文件对象长这样: {pprint.pformat(file.to_dict())}")
-        # 只取最后的文件名
-        file_name = os.path.basename(file.file_path)
+        # 自定义文件名：表情包集合名_sticker_序号.扩展名
+        original_file_name = os.path.basename(file.file_path)
+        file_extension = os.path.splitext(original_file_name)[1]  # 获取扩展名（如 .webp）
+        file_name = f"{set_name}_sticker_{i+1}{file_extension}"
         local_path = os.path.join(download_dir, file_name)
 
         # 下载并保存
