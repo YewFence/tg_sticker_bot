@@ -1,5 +1,8 @@
 # TG 表情包图片下载 Bot
 
+> [!NOTE]
+> 归档说明：已迁移至 https://github.com/YewFence/tgbridge
+
 来自于AptS:1547的奇思妙想  
 一个基于 python-telegram-bot 的简易 Telegram 机器人，用于：
 - 在“群聊”中，通过命令 /get 去“回复某个贴纸”，即可批量下载该贴纸所属的整个表情包集；
